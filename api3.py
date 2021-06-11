@@ -32,13 +32,6 @@ app = flask.Flask(__name__)
 app.config['SECRET_KEY'] = '123453452435243545455678'
 APIkey = os.environ['polyKEY']
 
-'''
-app.config.update(
-    DEBUG=True,
-    SECRET_KEY='12345'
-)
-'''
-
 def get_db_connection():
     DATABASE_URL = os.environ['DATABASE_URL']
     conn = psycopg2.connect(DATABASE_URL, sslmode='require')

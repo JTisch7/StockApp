@@ -145,7 +145,7 @@ def create():
         
             if (stk and frm and to):
                 global stocks
-                url = f"http://127.0.0.1:5000//api/v1/stockdata?stock={stk}&after={frm}&before={to}"
+                url = f"https://secret-lake-95487.herokuapp.com//api/v1/stockdata?stock={stk}&after={frm}&before={to}"
                 response = requests.get(url)
                 stocks = json.loads(response.text)
             return redirect('#charts')

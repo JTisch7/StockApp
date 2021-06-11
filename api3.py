@@ -29,7 +29,8 @@ import datetime
 
 app = flask.Flask(__name__)
 #app.config["DEBUG"] = True
-app.config['SECRET_KEY'] = '123453452435243545455678'
+secret_key = os.environ['secret']
+app.config['SECRET_KEY'] = secret_key
 APIkey = os.environ['polyKEY']
 
 def get_db_connection():

@@ -145,7 +145,9 @@ def create():
         
             if (stk and frm and to):
                 global stocks
-                stocks = setupStockCharts(stk, frm, to)
+                url = f"http://127.0.0.1:5000//api/v1/stockdata?stock={stk}&after={frm}&before={to}"
+                response = requests.get(url)
+                stocks = json.loads(response.text)
             return redirect('#charts')
 
                 

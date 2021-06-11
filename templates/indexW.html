@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <title>Web Application</title>
+  {% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul>
+    {% for message in messages %}
+      <li>{{ message }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+  {% endwith %}
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  <script src="https://cdn.anychart.com/releases/8.7.1/js/anychart-core.min.js" type="text/javascript"></script>
+  <script src="https://cdn.anychart.com/releases/8.7.1/js/anychart-stock.min.js" type="text/javascript"></script>
+  <script src="https://cdn.anychart.com/releases/8.7.1/js/anychart-data-adapter.min.js"></script>
+  <style>
+  body {
+    font: 20px Montserrat, sans-serif;
+    line-height: 1.8;
+    color: #f5f6f7;
+  }
+  p {font-size: 16px;}
+  .margin {
+    margin-bottom: 30px;
+    margin-top: 30px
+  }
+  .bg-1 { 
+    background-color: #1abc9c; /* Green */
+    color: #ffffff;
+  }
+  .bg-2 { 
+    background-color: #474e5d; /* Dark Blue */
+    color: #ffffff;
+  }
+  .bg-3 { 
+    background-color: #1abc9c; /* White */
+    color: #555555;
+  }
+  .bg-4 { 
+    background-color: #2f2f2f; /* Black Gray */
+    color: #fff;
+  }
+  .bg-5 { 
+    background-color: #ffd480; /* Green */
+    color: #ffffff;
+  }
+  .container-fluid {
+    padding-top: 40px;
+    padding-bottom: 40px;
+  }
+  .navbar {
+    padding-top: 15px;
+    padding-bottom: 15px;
+    border: 0;
+    border-radius: 0;
+    margin-bottom: 0;
+    font-size: 12px;
+    letter-spacing: 5px;
+  }
+  .navbar-nav  li a:hover {
+    color: #1abc9c !important;
+  }
+  #container {
+    margin-left:auto;
+    margin-right:auto;
+    width:70%;
+    height: 400px;
+  }
+  #cont {
+   
+    height: 400px;
+    margin: 0;
+    padding: 0;
+  }
+  ::placeholder {
+      color:#CDCDCD;
+  }
+  </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-default" style="background-color:#e6f2ff">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>                        
+      </button>
+    </div>
+    <div class="collapse navbar-collapse" id="myNavbar">
+      <ul class="nav navbar-nav navbar-right">
+        <li><a href="#charts">CHARTS</a></li>
+        <li><a href="#chartPred">PREDICT w/ CHART</a></li>
+        <li><a href="#predict">PREDICT w/ DATA</a></li>
+        <li><a href="#api">API</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Hello Container -->
+<div class="container-fluid bg-1 text-center" style="background:url('{{url_for('static', filename='img/marketchart3.jpg')}}') no-repeat; background-size: cover; opacity:100%;">
+  <h2 class="margin">Welcome</h2>
+  <img src="{{url_for('static', filename='img/robot2.png')}}" class="img-responsive  margin" style="display:inline" alt="Robot" width="350" height="350">
+  <!--<div style="padding-top: 15px; padding-bottom: 15px; padding-left: 15px; padding-right: 15px; margin-left: 20%; margin-right: 20%; background-color:#e6f2ff; color: #555555;"><p>This is an application was built using Flask, is served by Waitress, and is hosted on a cloud platform called Heroku.  It uses a PostgreSQL database which is updated automatically everytime the site is visited or the "Update Database" button is clicked.  The machine learning models were trained using SciKit-Learn on two years of 30 minute price data.</p></div>-->
+  <div class="margin" style="margin-left: 10%; margin-right: 10%;"><p>This is a machine learning-backed application aimed at providing the user access to trained machine learning models.  This application was built using the Flask framework, runs on a Waitress WSGI server, and is hosted on Heroku.  It uses a PostgreSQL database which is automatically updated with new data whenever the site is visited.  The machine learning models were trained using SciKit-Learn on two years of thirty minute price data.  The API is accessable and allows requests for stock price data and model predictions.</p></div>
+</div>
+
+
+<!-- Explain Container (Grid) -->
+<div class= "container-fluid bg-2 text-center">    
+  <h2 class="margin">About</h2>
+  <div class="row" style="margin-left:5%; margin-right:5%">
+    <div class="col-sm-3">
+      <h3 class="margin"><a href=#charts>Charts</a></h3>
+      <p>This section allows you to create custom charts based on a ticker and a chosen time frame.  The chart can then be zoomed in on and moved along the x-axis.</p>
+      <img src="{{url_for('static', filename='img/new1.jpg')}}" class="img-responsive margin" style="width:100%; height:250px;" alt="Image">
+    </div>
+    <div class="col-sm-3"> 
+      <h3 class="margin"><a href=#chartPred>Predict w/ Chart</a></h3>
+      <p>This section allows you to choose a stock and a trained model to predict the price direction.  It also provides an updated 10-day chart of the chosen stock.</p>
+      <img src="{{url_for('static', filename='img/new6.png')}}" class="img-responsive margin" style="width:100%; height:250px;" alt="Image">
+    </div>
+    <div class="col-sm-3"> 
+      <h3 class="margin"><a href=#predict>Predict w/ Data</a></h3>
+      <p>This section allows you to choose a model and input your own price data.  The models were trained in SciKit-Learn on two years of thirty minute price data.</p>
+      <img src="{{url_for('static', filename='img/ml.jpeg')}}" class="img-responsive margin" style="width:100%; height:250px;" alt="Image">
+    </div>
+    <div class="col-sm-3"> 
+      <h3 class="margin"><a href=#api>API</a></h3>
+      <p>This section provides instructions and examples on how to access the API and how to request data and/or use the trained models and pipelines assciated with each model.</p>
+      <img src="{{url_for('static', filename='img/nums.jpeg')}}" class="img-responsive margin" style="width:100%; height:250px;" alt="Image">
+    </div>
+  </div>
+</div>
+
+
+<!-- Chart Container -->
+<div class="container-fluid bg-1 text-center">
+    <h2 class="margin" id="charts">Charts</h2>
+    <div class="margin" id="container"></div>
+    <form method="post">
+      <div class="form-group row" style="padding-left:20%; padding-right:20%">
+      <div class="col-sm-6">  
+        <div class="margin">
+          <label for="stock">Stock</label>
+            <select class="form-control" type="text" name="stock" id="stock" style="color:#555555" value="{{ request.form['stock'] }}">
+              <option type="text" value="AAPL" >AAPL</option>
+              <option type="text" value="GOOG" >GOOG</option>
+              <option type="text" value="AMZN" >AMZN</option>
+              <option type="text" value="IBM" >IBM</option>
+              <option type="text" value="GS" >GS</option>               
+            </select>          
+        </div>
+        <div class="margin">
+          <label for="from">From</label>
+          <input class="form-control" type="datetime-local" name="from"
+               placeholder="2020-09-08 10:30" 
+               value="{{ request.form['from'] }}" style="color:#555555">
+          </input>
+        </div>
+        <div class="margin">
+          <label for="to">&nbsp; To &nbsp; &nbsp;</label>
+          <input class="form-control" type="datetime-local" name="to"
+               placeholder="2020-10-25 10:30" 
+               value="{{ request.form['to'] }}" style="color:#555555">
+          </input>
+        </div>
+      </div>
+      <div class="col-sm-6">  
+      <div class="form-group margin">
+        <button type="submit" class="btn btn-primary btn-lg" name="chart" value="val1">Submit</button>
+      </div>
+      {% if stk != '' and frm != '' and to != '' %}
+      <div style="margin-top:10px"><h3>Stock : {{stk}}</h3></div>
+      <div style="margin-top:10px"><h3>From : {{frm}}</h3></div>
+      <div style="margin-top:10px"><h3>To : {{to}}</h3></div>
+      {% endif %}
+      </div>
+      </div>
+    </form>
+</div>
+
+<!-- ChartPred Container -->
+<div class="container-fluid bg-2 text-center">
+    <h2 class="margin" id="chartPred">Predictions</h2>
+    <div class="row" style="padding-left:10%; padding-right:10%">
+      <div class="col-sm-6">
+        <div class="margin" id="cont"></div>
+      </div>
+      <div class="col-sm-6">
+        <form method="post">
+          <div class="form-group" >
+            <div class="margin">
+              <label for="stockPred">Stock</label>
+                <select class="form-control" type="text" name="stockPred" id="stockPred" style="color:#555555" value="{{ request.form['stockPred'] }}">
+                  <option type="text" value="AAPL" >AAPL</option>
+                  <option type="text" value="GOOG" >GOOG</option>
+                  <option type="text" value="AMZN" >AMZN</option>
+                  <option type="text" value="IBM" >IBM</option>
+                  <option type="text" value="GS" >GS</option>                  
+                </select> 
+            </div>
+            <div class="margin" style="word-wrap: break-word;">
+              <label for="model">Model</label>
+                <select class="form-control" type="text" name="model" id="model" style="color:#555555; word-wrap: break-word;" value="{{ request.form['model'] }}">
+                  <option type="text" value="GRADIENT BOOSTING" >GRADIENT BOOSTING</option>
+                  <option type="text" value="RANDOM FOREST" >RANDOM FOREST</option>
+                  <option type="text" value="SUPPORT VECTOR MACHINES" >SUPPORT VECTOR MACHINES</option>
+                  <option type="text" value="LOGISTIC REGRESSION CLASSIFIER" >LOGISTIC REGRESSION CLASSIFIER</option>
+                  <option type="text" value="ADABOOST" >ADABOOST</option>
+                </select>
+            </div> 
+          </div>
+          <div class="form-group">
+            <button type="submit" class="btn btn-primary btn-lg" name="pred" value="val2">Submit</button>
+          </div>
+          <div style="word-wrap: break-word;">
+            {% if stockPred != '' and mod != ''%}
+            <div style="margin-top:40px"><h3>Stock : {{stockPred}}</h3></div>
+            <div"><h3>Model : {{mod}}</h3></div>
+            {% endif %}
+            {% if yPredUp == yPredDown %}
+            {% elif yPredUp > yPredDown %}
+            <div style="border-style:solid; padding-bottom:10px; color:#3399ff;"><h3>Prediction Up : {{ yPredUp }}</h3></div>
+            <div style="padding-bottom:10px;"><h3>Prediction Down : {{ yPredDown }}</h3></div>
+            {% else %}
+            <div style="padding-bottom:10px;"><h3>Prediction Up : {{ yPredUp }}</h3></div>
+            <div style="border-style:solid; padding-bottom:10px; color:red;"><h3>Prediction Down : {{ yPredDown }}</h3></div>
+            {% endif %}
+          </div>
+        </form>
+      </div>
+    </div>
+</div>
+
+<!-- Pred Container -->
+<div class="container-fluid bg-1 text-center">
+    <h2 class="margin" id="predict">Predict with your own data</h2>
+    <div class="row" style="padding-left:10%; padding-right:10%">
+      <form method="post">
+        <div class="form-group" >
+          <div class="col-sm-5">
+            <div class="margin">
+                <label for="open">Open</label>            
+                <input class="form-control" type="number" step=".001" name="open"
+                     placeholder="55.56" 
+                     value="{{ request.form['open'] }}" style="color:#555555">
+                </input>        
+            </div>
+            <div class="margin">        
+                <label for="high">High</label>        
+                <input class="form-control" type="number" step=".001" name="high"
+                     placeholder="55.56" 
+                     value="{{ request.form['high'] }}" style="color:#555555">
+                </input>    
+            </div>
+            <div class="margin">  
+                <label for="low">Low</label>
+                <input class="form-control" type="number" step=".001" name="low"
+                     placeholder="55.56" 
+                     value="{{ request.form['low'] }}" style="color:#555555">
+                </input>
+            </div>
+            <div class="margin">
+                <label for="close">Close</label>  
+                <input class="form-control" type="number" step=".001" name="close"
+                     placeholder="55.56" 
+                     value="{{ request.form['close'] }}" style="color:#555555">
+                </input>
+            </div>            
+          </div>
+          <div class="col-sm-7">
+            <div class="margin">
+              <label for="model2">Model</label>
+                <select class="form-control" type="text" name="model2" id="model2" style="color:#555555" value="{{ request.form['model2'] }}">
+                  <option type="text" value="GRADIENT BOOSTING" >GRADIENT BOOSTING</option>
+                  <option type="text" value="RANDOM FOREST" >RANDOM FOREST</option>
+                  <option type="text" value="SUPPORT VECTOR MACHINES" >SUPPORT VECTOR MACHINES</option>
+                  <option type="text" value="LOGISTIC REGRESSION CLASSIFIER" >LOGISTIC REGRESSION CLASSIFIER</option>
+                  <option type="text" value="ADABOOST" >ADABOOST</option>
+                </select>
+            </div>   
+            <div class="form-group">
+              <button type="submit" class="btn btn-primary btn-lg" name="predict" value="val3">Submit</button>
+            </div>
+              <div style="word-wrap: break-word;">
+                {% if opn != '' and high != '' and low != '' and close != '' and mod2 != ''%}
+                <div style="margin-top:40px"><h3>Open : {{opn}}  &nbsp;  High : {{high}}  &nbsp;  Low : {{low}}  &nbsp;  Close : {{close}}</h3></div>
+                <div"><h3>Model : {{mod2}}</h3></div>
+                {% endif %}
+                {% if yPred2Up == yPred2Down %}
+                {% elif yPred2Up >= yPred2Down %}
+                <div style="border-style:solid; padding-bottom:10px; color:#3399ff;"><h3>Prediction Up : {{ yPred2Up }}</h3></div>
+                <div style="padding-bottom:10px;"><h3>Prediction Down : {{ yPred2Down }}</h3></div>
+                {% else %}
+                <div style="padding-bottom:10px;"><h3>Prediction Up : {{ yPred2Up }}</h3></div>
+                <div style="border-style:solid; padding-bottom:10px; color:red;"><h3>Prediction Down : {{ yPred2Down }}</h3></div>
+                {% endif %}
+              </div>
+          </div>
+        </div>
+      </form>
+    </div>
+</div>
+
+<!-- API Container -->
+<div class="container-fluid bg-2 text-center">    
+  <h2 id="api">API</h2>
+  <div style="margin-left:10%; margin-right:10%">
+    <div class="margin">
+      <p style="word-wrap: break-word;">The API provides access to stock price data and trained model predictions.  The API can be accessed using the following two endpoints :<br><br>Stock Price Data : http://secret-lake-95487.herokuapp.com/api/v1/stockdata<br>Model Predictions : http://secret-lake-95487.herokuapp.com/api/v1/predict</p>
+    </div>
+    <div class="container">
+      <div class="row">
+        <div class="col-sm-6" style="text-align: left; word-wrap: break-word;">
+          <h3>Stock Price Data Endpoint</h3>
+          <p>http://secret-lake-95487.herokuapp.com/api/v1/stockdata?stock={ticker}&from={fromEpoch}&to={toEpoch}</p>
+          <h3>Parameters</h3>
+          <div>
+            <p style="padding-bottom: 10px;">ticker = AAPL<br>- ticker symbol of stock (AAPL, AMZN, GOOG, IBM, GS)</p>
+            <p style="padding-top:10px; padding-bottom: 10px;">fromEpoch = 1620563942000<br>- starting epoch of the time window (epoch timestamp must be in milliseconds - if unfamiliar with epoch timestamp this website can be used to convert - https://www.epochconverter.com)</p>
+            <p style="padding-top:10px; padding-bottom: 10px;">toEpoch = 1622896742000<br>- ending epoch of the time window (epoch timestamp must be in milliseconds - if unfamiliar with epoch timestamp this website can be used to convert - https://www.epochconverter.com)</p>          
+            <p style="padding-top:10px; padding-bottom: 10px;">ex : http://secret-lake-95487.herokuapp.com/api/v1/stockdata?stock=IBM&from=1620218342000&to=1622896742000</p>
+          </div>
+        </div>
+        <div class="col-sm-6" style="text-align: left; word-wrap: break-word;">
+          <h3>Model Predictions Endpoint</h3>
+          <p>http://secret-lake-95487.herokuapp.com/api/v1/predict?model={model}&open={open}&high={high}&low={low}&close={close}</p>
+          <h3>Parameters</h3>
+          <div>
+          <p style="padding-bottom: 10px;">model = RFMod<br>- model used to predict (RFMod, logRegMod, adaMod, SVCMod, gbrtMod)</p>
+          <p style="padding-top:10px; padding-bottom: 10px;">open = 36.98<br>- open price used in prediction</p>
+          <p style="padding-top:10px; padding-bottom: 10px;">high = 38.51<br>- high price used in prediction</p>
+          <p style="padding-top:10px; padding-bottom: 10px;">low = 34.68<br>- low price used in prediction</p>
+          <p style="padding-top:10px; padding-bottom: 10px;">close = 37.12<br>- close price used in prediction</p>
+          <p style="padding-top:10px; padding-bottom: 10px;">ex : http://secret-lake-95487.herokuapp.com/api/v1/predict?model=RFMod&open=32.53&high=35.98&low=32.19&close=33.34</p>              
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer class="container-fluid bg-4 text-center">
+  <p style="word-wrap: break-word;">Check out the source code and more at &nbsp;<a href="https://github.com/JTisch7/Stock_WebApp">www.github.com/JTisch7/Stock_WebApp</a></p> 
+</footer>
+<script>
+  var stocks = JSON.parse('{{ stocks | tojson | safe}}');  
+  anychart.onDocumentReady(function () {
+
+      // set the data
+      table = anychart.data.table('date');
+      table.addData(stocks);
+
+      // map the data
+      mapping = table.mapAs({'open':"opn",'high': "high", 'low':"low", 'close':"close", 'volume':"volume"});
+      chart = anychart.stock();
+      
+      // set the series
+      var series = chart.plot(0).ohlc(mapping);
+      series.name("{{ stk }} stock prices");
+
+      // set the container id
+      chart.container('container');
+
+      // draw the chart
+      chart.draw();
+
+  });
+  var stocksPred = JSON.parse('{{ stocksPred | tojson | safe}}');  
+  anychart.onDocumentReady(function () {
+
+      // set the data
+      table = anychart.data.table('date');
+      table.addData(stocksPred);
+
+      // map the data
+      mapping = table.mapAs({'open':"opn",'high': "high", 'low':"low", 'close':"close", 'volume':"volume"});
+      chart = anychart.stock();
+      
+      // set the series
+      var series = chart.plot(0).ohlc(mapping);
+      series.name("{{ stockPred }} stock prices");
+
+      // set the container id
+      chart.container('cont');
+
+      // draw the chart
+      chart.draw();
+
+  });
+
+</script>
+
+</body>
+</html>

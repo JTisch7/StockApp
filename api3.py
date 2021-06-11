@@ -229,10 +229,10 @@ def api_filter():
         query += ' close>=%s AND'
         to_filter.append(close)
     if before:
-        query += ' epochDate<=%s AND'
+        query += ' date::timestamp<=%s AND'
         to_filter.append(before)
     if after:
-        query += ' epochDate>=%s AND'
+        query += ' date::timestamp>=%s AND'
         to_filter.append(after)
     if not (stock or before or after):
         return page_not_found(404)

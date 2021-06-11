@@ -325,13 +325,13 @@
       <div class="row">
         <div class="col-sm-6" style="text-align: left; word-wrap: break-word;">
           <h3>Stock Price Data Endpoint</h3>
-          <p>http://secret-lake-95487.herokuapp.com/api/v1/stockdata?stock={ticker}&from={fromEpoch}&to={toEpoch}</p>
+          <p>http://secret-lake-95487.herokuapp.com/api/v1/stockdata?stock={ticker}&after={after}&before={before}</p>
           <h3>Parameters</h3>
           <div>
             <p style="padding-bottom: 10px;">ticker = AAPL<br>- ticker symbol of stock (AAPL, AMZN, GOOG, IBM, GS)</p>
-            <p style="padding-top:10px; padding-bottom: 10px;">fromEpoch = 1620563942000<br>- starting epoch of the time window (epoch timestamp must be in milliseconds - if unfamiliar with epoch timestamp this website can be used to convert - https://www.epochconverter.com)</p>
-            <p style="padding-top:10px; padding-bottom: 10px;">toEpoch = 1622896742000<br>- ending epoch of the time window (epoch timestamp must be in milliseconds - if unfamiliar with epoch timestamp this website can be used to convert - https://www.epochconverter.com)</p>          
-            <p style="padding-top:10px; padding-bottom: 10px;">ex : http://secret-lake-95487.herokuapp.com/api/v1/stockdata?stock=IBM&from=1620218342000&to=1622896742000</p>
+            <p style="padding-top:10px; padding-bottom: 10px;">after = 05-20-2021 09:30<br>- starting date and time of the window</p>
+            <p style="padding-top:10px; padding-bottom: 10px;">before = 06-08-2021 11:00<br>-  ending date and time of the window</p>          
+            <p style="padding-top:10px; padding-bottom: 10px;">ex : http://secret-lake-95487.herokuapp.com/api/v1/stockdata?stock=IBM&after=05-20-2021 09:30&before=06-08-2021 11:00</p>
           </div>
         </div>
         <div class="col-sm-6" style="text-align: left; word-wrap: break-word;">

@@ -17,7 +17,6 @@ import pandas as pd
 import time
 import psycopg2
 from dateutil.parser import parse
-#import asyncio
 import os
 import requests
 import math
@@ -28,7 +27,6 @@ import datetime
 #from waitress import serve
 
 app = flask.Flask(__name__)
-#app.config["DEBUG"] = True
 secret_key = os.environ['secret']
 app.config['SECRET_KEY'] = secret_key
 APIkey = os.environ['polyKEY']
@@ -145,62 +143,67 @@ def create():
         
             if (stk and frm and to):
                 global stocks
-                url = f"https://secret-lake-95487.herokuapp.com//api/v1/stockdata?stock={stk}&after={frm}&before={to}"
+                url = url_for('api_filter', _external=True, stock=stk, after=frm, before=to)
                 response = requests.get(url)
                 stocks = json.loads(response.text)
             return redirect('#charts')
-
-                
+    
         if request.form.get('pred') == 'val2':
             global mod, stockPred
-            mod = request.form['model']
+            model = request.form['model']
             stockPred = request.form['stockPred']
-            if (mod and stockPred):
-                global gbrtMod, RFMod, logRegMod, adaMod, SVCMod
-                if mod == 'GRADIENT BOOSTING':
+            if (model and stockPred):
+                if model == 'gbrtMod':
                     mod = gbrtMod
-                if mod == 'RANDOM FOREST':
+                if model == 'RFMod':
                     mod = RFMod
-                if mod == 'LOGISTIC REGRESSION CLASSIFIER':
+                if model == 'logRegMod':
                     mod = logRegMod
-                if mod == 'ADABOOST':
+                if model == 'adaMod':
                     mod = adaMod
-                if mod == 'SUPPORT VECTOR MACHINES':
-                    mod = SVCMod                
-                global stocksPred
-                stocksPred = setupStockCharts(f'{stockPred}',curTime-TenDays, curTime)
-                global yPred, yPredUp, yPredDown
-                xTest = dataPipeline(stocksPred[-1]['opn'],stocksPred[-1]['high'],stocksPred[-1]['low'],
-                                     stocksPred[-1]['close'],stocksPred[-2]['volume'],stocksPred[-1]['volume'])
-                yPred = predict(xTest, mod)
-                yPredUp = round(yPred[0][1], 4)
-                yPredDown = round(yPred[0][0], 4)
+                if model == 'SVCMod':
+                    mod = SVCMod 
+
+                global stocksPred, yPred, yPredUp, yPredDown
+                url = url_for('api_filter', _external=True, stock=stockPred, after=curTime-TenDays, before=curTime)
+                response = requests.get(url)
+                stocksPred = json.loads(response.text) 
+
+                url2 = url_for('predictFunc', _external=True, model=model, open=stocksPred[-1]['opn'], high=stocksPred[-1]['high'], low=stocksPred[-1]['low'], close=stocksPred[-1]['close'])
+                response2 = requests.get(url2)
+                yPred = json.loads(response2.text)   
+                yPredUp = round(yPred[0], 4)
+                yPredDown = round(yPred[1], 4)
+
             return redirect('#chartPred')
         
         if request.form.get('predict') == 'val3':
             if (request.form['open'] and request.form['high'] and request.form['low'] and request.form['close'] and request.form['model2']):
                 global mod2, opn, high, low, close
-                opn = float(request.form['open'])
-                high = float(request.form['high'])
-                low = float(request.form['low'])   
-                close = float(request.form['close'])            
-                mod2 = request.form['model2']
+                opn = request.form['open']
+                high = request.form['high']
+                low = request.form['low']  
+                close = request.form['close']            
+                model = request.form['model2']
             
-                if mod2 == 'GRADIENT BOOSTING':
+                if model == 'gbrtMod':
                     mod2 = gbrtMod
-                if mod2 == 'RANDOM FOREST':
+                if model == 'RFMod':
                     mod2 = RFMod
-                if mod2 == 'LOGISTIC REGRESSION CLASSIFIER':
+                if model == 'logRegMod':
                     mod2 = logRegMod
-                if mod2 == 'ADABOOST':
+                if model == 'adaMod':
                     mod2 = adaMod
-                if mod2 == 'SUPPORT VECTOR MACHINES':
-                    mod2 = SVCMod   
+                if model == 'SVCMod':
+                    mod2 = SVCMod 
+
                 global yPred2, yPred2Up, yPred2Down
-                xTest = dataPipeline(opn, high, low, close, 500, 400)
-                yPred2 = predict(xTest, mod2)
-                yPred2Up = round(yPred2[0][1], 4)
-                yPred2Down = round(yPred2[0][0], 4)                
+                url2 = url_for('predictFunc', _external=True, model=model, open=opn, high=high, low=low, close=close)
+                response2 = requests.get(url2)
+                yPred2 = json.loads(response2.text)   
+                yPred2Up = round(yPred2[0], 4)
+                yPred2Down = round(yPred2[1], 4)
+     
             return redirect('#predict')   
         
         
@@ -256,27 +259,27 @@ def api_filter():
 def predictFunc():
     query_parameters = request.args
 
-    mod = query_parameters.get('model')
+    model = query_parameters.get('model')
     opn = float(query_parameters.get('open'))
     high = float(query_parameters.get('high'))
     low = float(query_parameters.get('low'))
     close = float(query_parameters.get('close'))
-    if mod == 'gbrtMod':
-        mod = gbrtMod
-    if mod == 'RFMod':
-        mod = RFMod
-    if mod == 'logRegMod':
-        mod = logRegMod
-    if mod == 'adaMod':
-        mod = adaMod
-    if mod == 'SVCMod':
-        mod = SVCMod  
+    if model == 'gbrtMod':
+        model = gbrtMod
+    if model == 'RFMod':
+        model = RFMod
+    if model == 'logRegMod':
+        model = logRegMod
+    if model == 'adaMod':
+        model = adaMod
+    if model == 'SVCMod':
+        model = SVCMod  
 
-    if not (mod and open and high and low and close):
+    if not (model and open and high and low and close):
         return page_not_found(404)
 
     xTest = dataPipeline(opn, high, low, close, 500, 400)
-    return jsonify(list(predict(xTest, mod)[0]))
+    return jsonify(list(predict(xTest, model)[0]))
 
 
 @app.errorhandler(404)

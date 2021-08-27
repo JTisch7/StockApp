@@ -116,7 +116,7 @@ def predict(xTest, model=gbrtMod):
 def setupStockCharts(stk, frm, to):
     conn, cur = get_db_connection()
     cur.execute("SELECT * FROM stocks WHERE stock=%s AND date::timestamp >= %s AND date::timestamp <= %s", (stk, frm, to))
-    columns = ('opn', 'high', 'low', 'close', 'volume', 'epochDate', 'date', 'stock')
+    columns = ('opn', 'high', 'low', 'close', 'volume', 'epochDate', 'stock')
     results = []
     '''
     for row in cur.fetchall():
@@ -253,7 +253,7 @@ def api_filter():
 
     conn, cur = get_db_connection()
     cur.execute(query, to_filter)
-    columns = ('opn', 'high', 'low', 'close', 'volume', 'epochDate', 'date', 'stock')
+    columns = ('opn', 'high', 'low', 'close', 'volume', 'epochDate', 'stock')
     results = []
     '''for row in cur.fetchall():
         results.append(dict(zip(columns, row)))'''

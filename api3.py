@@ -264,7 +264,13 @@ def api_filter():
     cur.execute(query, to_filter)
     columns = ('opn', 'high', 'low', 'close', 'volume', 'epochDate', 'date', 'stock')
     results = []
+    '''for row in cur.fetchall():
+        #row = row.values.tolist()
+        results.append(dict(zip(columns, row)))'''
     for row in cur.fetchall():
+        row = list(row)
+        row.pop(6)
+        row[5]=int(row[5])
         results.append(dict(zip(columns, row)))
     cur.close()
     conn.close()        

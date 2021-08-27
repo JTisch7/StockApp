@@ -112,7 +112,7 @@ def predict(xTest, model=gbrtMod):
     transformedData = newPipeline.transform(xTest)      
     result = model.predict_proba(transformedData)
     return result
-
+'''
 def setupStockCharts(stk, frm, to):
     conn, cur = get_db_connection()
     cur.execute("SELECT * FROM stocks WHERE stock=%s AND date::timestamp >= %s AND date::timestamp <= %s", (stk, frm, to))
@@ -123,13 +123,29 @@ def setupStockCharts(stk, frm, to):
     cur.close()
     conn.close()        
     return results
+'''
+def setupStockCharts(stk, frm, to):
+    conn, cur = get_db_connection()
+    cur.execute("SELECT * FROM stocks WHERE stock=%s AND epochdate >= %s AND epochdate <= %s", (stk, frm, to))
+    columns = ('opn', 'high', 'low', 'close', 'volume', 'epochDate', 'date', 'stock')
+    results = []
+    for row in cur.fetchall():
+        row = list(row)
+        row.pop(6)
+        row[5]=int(row[5])
+        #row[6] = datetime.datetime.fromtimestamp(row[6])
+        results.append(dict(zip(columns, row)))
+    cur.close()
+    conn.close()        
+    return results
 
 
 curTime = datetime.datetime.now()
 TenDays = datetime.timedelta(10)
 OneMonth = datetime.timedelta(30)
-stocks = setupStockCharts('AAPL', curTime-OneMonth, curTime)
-stocksPred = setupStockCharts('AMZN', curTime-TenDays, curTime)
+#stocks = setupStockCharts('AAPL', curTime-OneMonth, curTime)
+#stocksPred = setupStockCharts('AMZN', curTime-TenDays, curTime)
+stocks = setupStockCharts('AAPL', 1619499209000, 1630040009000)
 
 
 @app.route('/', methods=('GET', 'POST'))
